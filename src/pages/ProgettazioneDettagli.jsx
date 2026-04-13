@@ -11,6 +11,7 @@ const TABS = [
   { id: 'dettaglio', label: 'Dettaglio', bg: '#5890ff', text: 'white' },
   { id: 'partecipanti', label: 'Partecipanti', bg: '#5890ff', text: 'white' },
   { id: 'personale', label: 'Personale', bg: '#5890ff', text: 'white' },
+  { id: 'stage', label: 'Stage', bg: '#5890ff', text: 'white' },
   { id: 'economici', label: 'Dati economici', bg: '#f0ad4e', text: 'white' },
   { id: 'verifica', label: 'Verifica e conferma P.E.', bg: '#d9534f', text: 'white' }
 ];
@@ -454,7 +455,7 @@ function ProgettazioneDettagli() {
   const disabiliInseriti = participants.filter((participant) => String(participant.disabile || '').toLowerCase() === 'si').length;
   const maxAllieviDisabili = Math.max(1, Math.floor((participants.length || maxAllievi) * 0.2));
   const hasDisabiliExceeded = disabiliInseriti > maxAllieviDisabili;
-  const allValid = !hasDettaglioErrors && !hasPartecipantiErrors && !hasPersonaleErrors && !hasDisabiliExceeded;
+  const allValid = !hasDettaglioErrors && !hasPartecipantiErrors && !hasPersonaleErrors && !hasStageErrors && !hasDisabiliExceeded;
   const detailHasError = (needle) => detailErrors.some((error) => error.toLowerCase().includes(needle));
   const stageBounds = getStageDayBounds(stageForm.oreStage);
   const comuniNascitaOptions = COMUNI_BY_PROVINCE[participantForm.provinciaNascita] || [];
@@ -863,42 +864,6 @@ function ProgettazioneDettagli() {
               </div>
             </div>
 
-            <div className="card border-0 rounded-0 shadow-sm mb-4">
-              <div className="card-header border-0 rounded-0 p-2 text-white" style={{ backgroundColor: '#d71920', fontWeight: 600 }}>Dettaglio STAGE</div>
-              <div className="card-body p-3">
-                <div className="row g-3 mb-2">
-                  <div className="col-md-2">
-                    <label className="form-label mb-1" style={{ fontSize: '0.75rem' }}>Ore Stage</label>
-                    <input type="number" className="form-control form-control-sm" name="ore_stage" data-field="ore_stage" value={stageForm.oreStage} disabled readOnly style={{ borderColor: '#ccc', backgroundColor: '#f3f3f3' }} />
-                  </div>
-                  <div className="col-md-2">
-                    <label className="form-label mb-1" style={{ fontSize: '0.75rem' }}>Data avvio stage</label>
-                    <input type="text" inputMode="numeric" autoComplete="off" placeholder="ggmmaaaa" title={DATE_INPUT_HINT} name="data_avvio_stage" data-field="data_avvio_stage" className="form-control form-control-sm" value={stageForm.dataAvvio} onChange={(event) => { setStageForm((prev) => ({ ...prev, dataAvvio: event.target.value })); setStageFeedback(''); }} style={{ borderColor: stageErrors.dataAvvio ? '#d9534f' : '#ccc' }} />
-                  </div>
-                  <div className="col-md-2">
-                    <label className="form-label mb-1" style={{ fontSize: '0.75rem' }}>Data fine stage</label>
-                    <input type="text" inputMode="numeric" autoComplete="off" placeholder="ggmmaaaa" title={DATE_INPUT_HINT} name="data_fine_stage" data-field="data_fine_stage" className="form-control form-control-sm" value={stageForm.dataFine} onChange={(event) => { setStageForm((prev) => ({ ...prev, dataFine: event.target.value })); setStageFeedback(''); }} style={{ borderColor: stageErrors.dataFine ? '#d9534f' : '#ccc' }} />
-                  </div>
-                  <div className="col-md-2">
-                    <label className="form-label mb-1" style={{ fontSize: '0.75rem' }}>GG minime</label>
-                    <input type="number" className="form-control form-control-sm" value={stageBounds.min} disabled readOnly style={{ backgroundColor: '#f3f3f3', borderColor: '#ccc' }} />
-                  </div>
-                  <div className="col-md-2">
-                    <label className="form-label mb-1" style={{ fontSize: '0.75rem' }}>GG massime</label>
-                    <input type="number" className="form-control form-control-sm" value={stageBounds.max} disabled readOnly style={{ backgroundColor: '#f3f3f3', borderColor: '#ccc' }} />
-                  </div>
-                  <div className="col-md-2">
-                    <label className="form-label mb-1" style={{ fontSize: '0.75rem' }}>Giornate Stage</label>
-                    <input name="giornate_stage" data-field="giornate_stage" type="number" className="form-control form-control-sm" value={stageForm.giornateStage} onChange={(event) => { setStageForm((prev) => ({ ...prev, giornateStage: event.target.value })); setStageFeedback(''); }} style={{ borderColor: stageErrors.giornateStage ? '#d9534f' : '#ccc' }} />
-                  </div>
-                </div>
-                <div className="d-flex justify-content-end gap-2 mt-2">
-                  <button type="button" className="btn btn-sm text-white px-3" style={{ backgroundColor: '#5890ff' }} onClick={handleSaveStage}>SALVA STAGE</button>
-                </div>
-                {stageFeedback && <div className="alert alert-success mt-2 mb-0" style={{ fontSize: '0.78rem' }}>{stageFeedback}</div>}
-                {Object.keys(stageErrors).length > 0 && <div className="alert alert-danger mt-2 mb-0" style={{ fontSize: '0.78rem' }}>Correggi i campi stage evidenziati.</div>}
-              </div>
-            </div>
 
             <div className="card border-0 rounded-0 shadow-sm mb-5">
               <div className="card-header border-0 rounded-0 p-2 text-white" style={{ backgroundColor: '#4f8fe8', fontWeight: 600 }}>Sedi Operative Occasionali</div>
@@ -1448,7 +1413,7 @@ function ProgettazioneDettagli() {
           </div>
         )}
 
-        {activeTab === 'stage_disabled' && (
+        {activeTab === 'stage' && (
           <>
             <div className="card border-0 rounded-0 shadow-sm mb-4">
               <div className="card-header border-0 rounded-0 p-2 text-white" style={{ backgroundColor: '#d71920', fontWeight: 600 }}>Dettaglio STAGE</div>
@@ -1757,6 +1722,7 @@ function ProgettazioneDettagli() {
                     <div className="list-group-item d-flex justify-content-between"><span>Dettaglio percorso</span><span style={{ color: hasDettaglioErrors ? '#d9534f' : '#4caf50' }}>{hasDettaglioErrors ? 'KO' : 'OK'}</span></div>
                     <div className="list-group-item d-flex justify-content-between"><span>Partecipanti (minimo 8 - massimo 15)</span><span style={{ color: hasPartecipantiErrors ? '#d9534f' : '#4caf50' }}>{hasPartecipantiErrors ? 'KO' : 'OK'}</span></div>
                     <div className="list-group-item d-flex justify-content-between"><span>Personale obbligatorio</span><span style={{ color: hasPersonaleErrors ? '#d9534f' : '#4caf50' }}>{hasPersonaleErrors ? 'KO' : 'OK'}</span></div>
+                    <div className="list-group-item d-flex justify-content-between"><span>Imprese stage</span><span style={{ color: hasStageErrors ? '#d9534f' : '#4caf50' }}>{hasStageErrors ? 'KO' : 'OK'}</span></div>
                     <div className="list-group-item d-flex justify-content-between"><span>Limite disabili (max 20% allievi iscritti)</span><span style={{ color: hasDisabiliExceeded ? '#d9534f' : '#4caf50' }}>{hasDisabiliExceeded ? 'KO' : 'OK'}</span></div>
                   </div>
                   <div className="d-flex justify-content-center"><button type="button" className="btn text-white" style={{ backgroundColor: '#57e112' }} disabled={!allValid} onClick={() => setEditionVerification(activeEditionId, 'confirmed')}>CONFERMA</button></div>
