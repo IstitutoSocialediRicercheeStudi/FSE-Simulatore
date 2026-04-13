@@ -221,9 +221,7 @@ function validateDetail(detail) {
   const fasciaARaw = String(detail.oreFasciaA ?? '').trim();
   const fasciaBRaw = String(detail.oreFasciaB ?? '').trim();
   const fasciaCRaw = String(detail.oreFasciaC ?? '').trim();
-  if (!fasciaARaw) errors.push("Le ore per docenti di Fascia A sono obbligatorie (punto 2.18.5).");
-  if (!fasciaBRaw) errors.push("Le ore per docenti di Fascia B sono obbligatorie (punto 2.18.5).");
-  if (!fasciaCRaw) errors.push("Le ore per docenti di Fascia C sono obbligatorie (punto 2.18.5).");
+  if (!fasciaARaw && !fasciaBRaw && !fasciaCRaw) errors.push("Compilare almeno una fascia oraria docenti (punto 2.18.5).");
   if (fasciaARaw && (Number(fasciaARaw) < 0 || !Number.isFinite(Number(fasciaARaw)))) errors.push("Ore Fascia A non valide.");
   if (fasciaBRaw && (Number(fasciaBRaw) < 0 || !Number.isFinite(Number(fasciaBRaw)))) errors.push("Ore Fascia B non valide.");
   if (fasciaCRaw && (Number(fasciaCRaw) < 0 || !Number.isFinite(Number(fasciaCRaw)))) errors.push("Ore Fascia C non valide.");
@@ -773,7 +771,7 @@ function ProgettazioneDettagli() {
             <div className="card border-0 rounded-0 shadow-sm mb-4">
               <div className="card-header border-0 rounded-0 p-2 text-white d-flex align-items-center justify-content-between" style={{ backgroundColor: '#4f8fe8', fontWeight: 600 }}>
                 <span>Dettaglio Percorso</span>
-                <HintBadge text="Compila tutti i campi obbligatori: date di avvio e fine, importo, e le ore per fascia. Le date devono rispettare i limiti del programma (fino al 31/12/2027)." position="left" />
+                <HintBadge text="Compila tutti i campi obbligatori: date di avvio e fine, importo, e almeno una fascia oraria docenti. Le date devono rispettare i limiti del programma (fino al 31/12/2027)." position="left" />
               </div>
               <div className="card-body p-3">
                 <div className="mb-2" style={{ fontSize: '0.9rem', fontWeight: 600 }}>Sede di erogazione del percorso</div>
