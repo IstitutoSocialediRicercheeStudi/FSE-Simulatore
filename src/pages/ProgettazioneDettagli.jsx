@@ -11,7 +11,6 @@ const TABS = [
   { id: 'dettaglio', label: 'Dettaglio', bg: '#5890ff', text: 'white' },
   { id: 'partecipanti', label: 'Partecipanti', bg: '#5890ff', text: 'white' },
   { id: 'personale', label: 'Personale', bg: '#5890ff', text: 'white' },
-  { id: 'stage', label: 'Stage', bg: '#5890ff', text: 'white' },
   { id: 'economici', label: 'Dati economici', bg: '#f0ad4e', text: 'white' },
   { id: 'verifica', label: 'Verifica e conferma P.E.', bg: '#d9534f', text: 'white' }
 ];
@@ -455,7 +454,7 @@ function ProgettazioneDettagli() {
   const disabiliInseriti = participants.filter((participant) => String(participant.disabile || '').toLowerCase() === 'si').length;
   const maxAllieviDisabili = Math.max(1, Math.floor((participants.length || maxAllievi) * 0.2));
   const hasDisabiliExceeded = disabiliInseriti > maxAllieviDisabili;
-  const allValid = !hasDettaglioErrors && !hasPartecipantiErrors && !hasPersonaleErrors && !hasStageErrors && !hasDisabiliExceeded;
+  const allValid = !hasDettaglioErrors && !hasPartecipantiErrors && !hasPersonaleErrors && !hasDisabiliExceeded;
   const detailHasError = (needle) => detailErrors.some((error) => error.toLowerCase().includes(needle));
   const stageBounds = getStageDayBounds(stageForm.oreStage);
   const comuniNascitaOptions = COMUNI_BY_PROVINCE[participantForm.provinciaNascita] || [];
@@ -792,7 +791,7 @@ function ProgettazioneDettagli() {
                   <div className="col-md-4"><label className="form-label mb-1" style={{ fontSize: '0.75rem' }}>Numero di giornate minime (Giornata formativa di 8 ore)</label><input type="number" className="form-control form-control-sm" value={detailForm.minDays8h || ''} readOnly style={{ borderColor: '#ccc', backgroundColor: '#f3f3f3' }} /></div>
                   <div className="col-md-4"><label className="form-label mb-1" style={{ fontSize: '0.75rem' }}>Numero di giornate massime (Giornata formativa di 4 ore)</label><input type="number" className="form-control form-control-sm" value={detailForm.maxDays4h || ''} readOnly style={{ borderColor: '#ccc', backgroundColor: '#f3f3f3' }} /></div>
                   <div className="col-md-4">
-                    <label className="form-label mb-1" style={{ fontSize: '0.75rem' }}>Giornate di aula previste</label>
+                    <label className="form-label mb-1" style={{ fontSize: '0.75rem' }}>Giornate di aula previste + stage</label>
                     <input
                       name="giornate_aula_previste"
                       data-field="giornate_aula_previste"
@@ -1449,31 +1448,8 @@ function ProgettazioneDettagli() {
           </div>
         )}
 
-        {activeTab === 'stage' && (
+        {activeTab === 'stage_disabled' && (
           <>
-            <div className="card border rounded-0 shadow-sm mb-3">
-              <table className="table table-sm mb-0" style={{ fontSize: '0.8rem' }}>
-                <tbody>
-                  <tr>
-                    <th className="w-25" style={{ backgroundColor: '#f7f7f7' }}>Titolo / Denominazione del percorso</th>
-                    <td><strong>{course.title}</strong></td>
-                  </tr>
-                  <tr>
-                    <th style={{ backgroundColor: '#f7f7f7' }}>Allievi minimi / Allievi massimi:</th>
-                    <td><strong>{minAllievi} / {maxAllievi}</strong></td>
-                  </tr>
-                  <tr>
-                    <th style={{ backgroundColor: '#f7f7f7' }}>Allievi disabili inseriti</th>
-                    <td><strong>{disabiliInseriti}</strong></td>
-                  </tr>
-                  <tr>
-                    <th style={{ backgroundColor: '#f7f7f7' }}>Numero massimo allievi disabili</th>
-                    <td><strong>{maxAllieviDisabili}</strong></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
             <div className="card border-0 rounded-0 shadow-sm mb-4">
               <div className="card-header border-0 rounded-0 p-2 text-white" style={{ backgroundColor: '#d71920', fontWeight: 600 }}>Dettaglio STAGE</div>
               <div className="card-body p-3">
@@ -1781,7 +1757,6 @@ function ProgettazioneDettagli() {
                     <div className="list-group-item d-flex justify-content-between"><span>Dettaglio percorso</span><span style={{ color: hasDettaglioErrors ? '#d9534f' : '#4caf50' }}>{hasDettaglioErrors ? 'KO' : 'OK'}</span></div>
                     <div className="list-group-item d-flex justify-content-between"><span>Partecipanti (minimo 8 - massimo 15)</span><span style={{ color: hasPartecipantiErrors ? '#d9534f' : '#4caf50' }}>{hasPartecipantiErrors ? 'KO' : 'OK'}</span></div>
                     <div className="list-group-item d-flex justify-content-between"><span>Personale obbligatorio</span><span style={{ color: hasPersonaleErrors ? '#d9534f' : '#4caf50' }}>{hasPersonaleErrors ? 'KO' : 'OK'}</span></div>
-                    <div className="list-group-item d-flex justify-content-between"><span>Imprese stage</span><span style={{ color: hasStageErrors ? '#d9534f' : '#4caf50' }}>{hasStageErrors ? 'KO' : 'OK'}</span></div>
                     <div className="list-group-item d-flex justify-content-between"><span>Limite disabili (max 20% allievi iscritti)</span><span style={{ color: hasDisabiliExceeded ? '#d9534f' : '#4caf50' }}>{hasDisabiliExceeded ? 'KO' : 'OK'}</span></div>
                   </div>
                   <div className="d-flex justify-content-center"><button type="button" className="btn text-white" style={{ backgroundColor: '#57e112' }} disabled={!allValid} onClick={() => setEditionVerification(activeEditionId, 'confirmed')}>CONFERMA</button></div>
