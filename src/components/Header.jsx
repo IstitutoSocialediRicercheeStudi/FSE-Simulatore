@@ -81,8 +81,8 @@ function Header() {
                         </div>
                       )}
 
-                      {/* Simulation Timer */}
-                      {selectedRole && (
+                      {/* Simulation Timer - only visible after simulation started */}
+                      {selectedRole && (simulationActive || simulationElapsedMs > 0) && (
                         <div className="d-flex align-items-center px-2 py-1 rounded border" style={{
                           gap: '0.4rem',
                           backgroundColor: simulationActive ? '#f0fff4' : '#fff',
