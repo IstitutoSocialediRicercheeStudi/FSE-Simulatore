@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Portale demo PR FSE+ Sicilia 2021-2027 per gestione progettazione esecutiva, partecipanti e richiesta risorse." />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#0059b3" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:title" content="PR FSE+ Sicilia 2021-2027" />
+    <meta property="og:description" content="Portale demo per flussi operativi PR FSE+ Sicilia: progettazione, verifica e richiesta risorse." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="PR FSE+ Sicilia 2021-2027" />
+    <meta name="twitter:description" content="Portale demo per flussi operativi PR FSE+ Sicilia." />
+    <title>PR FSE+ Sicilia 2021-2027</title>
+    <!-- Bootstrap Italia CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-italia@2.8.5/dist/css/bootstrap-italia.min.css" rel="stylesheet">
+    <style>
+      .app-layout { min-height: 100vh; display: flex; flex-direction: column; }
+      main { flex: 1; }
+
+      /* Anti-bot honeypot: nascosto via CSS, NON display:none */
+      .hp-field-wrap {
+        position: absolute;
+        opacity: 0;
+        top: -9999px;
+        left: -9999px;
+        height: 0;
+        width: 0;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: -1;
+      }
+      .hp-field-wrap input { font-size: 1px; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-italia@2.8.5/dist/js/bootstrap-italia.bundle.min.js"></script>
+  </body>
+</html>

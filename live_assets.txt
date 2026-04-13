@@ -1,0 +1,13 @@
+https://fse.regione.sicilia.it/assets/bootstrap-italia/css/bootstrap-italia.min.css
+https://fse.regione.sicilia.it/assets/bootstrap-italia/svg/sprites.svg
+https://fse.regione.sicilia.it/assets/css/common.css
+https://fse.regione.sicilia.it/assets/css/main.css
+https://fse.regione.sicilia.it/media/images/UE.svg
+https://fse.regione.sicilia.it/media/images/coesione-italia.svg
+https://fse.regione.sicilia.it/media/images/home-hero.jpg
+https://fse.regione.sicilia.it/media/images/logo-regione-siciliana.png
+https://fse.regione.sicilia.it/media/images/news-1.jpg
+https://fse.regione.sicilia.it/media/images/news-2.jpg
+https://fse.regione.sicilia.it/media/images/news-3.jpg
+https://fse.regione.sicilia.it/media/images/news-4.jpg
+https://fse.regione.sicilia.it/media/images/news-5.jpg

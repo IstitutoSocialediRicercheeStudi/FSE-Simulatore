@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Autofill Dinamico Lab</title>
+    <style>
+      :root {
+        --bg: #f3f6fa;
+        --panel: #ffffff;
+        --line: #d4dce5;
+        --text: #1f2b38;
+        --muted: #5b6d80;
+        --primary: #1e7be8;
+        --ok: #1e8e3e;
+        --warn: #d97904;
+        --err: #c93838;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      .layout {
+        max-width: 1300px;
+        margin: 0 auto;
+        display: grid;
+        gap: 14px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 14px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      h2 {
+        margin: 0 0 10px 0;
+        font-size: 18px;
+      }
+
+      h3 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        color: #23405f;
+      }
+
+      .subtle {
+        margin: 8px 0 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      button {
+        border: 1px solid #b8c7d7;
+        border-radius: 6px;
+        background: #fff;
+        font-size: 13px;
+        padding: 8px 11px;
+        cursor: pointer;
+      }
+
+      button.primary {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+      }
+
+      .grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .grid.three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .grid.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        font-size: 13px;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border: 1px solid #b8c7d7;
+        border-radius: 6px;
+        padding: 8px;
+        font-size: 13px;
+        background: #fff;
+      }
+
+      textarea {
+        min-height: 140px;
+        resize: vertical;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      }
+
+      fieldset {
+        border: 1px dashed #b8c7d7;
+        border-radius: 8px;
+        padding: 8px 10px;
+        margin: 0;
+      }
+
+      legend {
+        font-size: 12px;
+        color: var(--muted);
+        padding: 0 6px;
+      }
+
+      .radio-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .radio-row label {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .metric-row {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .metric {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 9px;
+      }
+
+      .metric .label {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .metric .value {
+        margin-top: 3px;
+        font-size: 19px;
+        font-weight: 700;
+      }
+
+      .ok {
+        color: var(--ok);
+      }
+
+      .warn {
+        color: var(--warn);
+      }
+
+      .err {
+        color: var(--err);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        font-size: 12px;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--line);
+        padding: 7px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #f8fafc;
+      }
+
+      .status-ok {
+        color: var(--ok);
+        font-weight: 700;
+      }
+
+      .status-ko {
+        color: var(--err);
+        font-weight: 700;
+      }
+
+      .status-miss {
+        color: var(--warn);
+        font-weight: 700;
+      }
+
+      @media (max-width: 1000px) {
+        .grid.three,
+        .grid.two,
+        .metric-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="layout">
+      <section class="panel">
+        <h1>Autofill Dinamico Lab</h1>
+        <p class="subtle">
+          Pagina test standalone: i campi hanno nomi e label diversi rispetto al portale, per verificare se il modello
+          <strong>DINAMICO</strong> fa matching intelligente.
+        </p>
+        <p class="subtle">
+          Flusso consigliato: 1) crea un profilo dedicato nel bot con i valori qui sotto, 2) apri questa pagina,
+          3) clicca "Compila pagina attiva" dall'estensione, 4) clicca "Valuta accuracy".
+        </p>
+        <div class="actions">
+          <button id="copyProfileBtn" type="button">Copia valori profilo test</button>
+          <button id="resetBtn" type="button">Reset campi</button>
+          <button id="evaluateBtn" type="button" class="primary">Valuta accuracy</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Valori profilo test</h2>
+        <textarea id="profileDataPreview" readonly></textarea>
+      </section>
+
+      <form id="dynamicLabForm" class="grid">
+        <section class="panel">
+          <h3>Anagrafica (nomi alternativi)</h3>
+          <div class="grid three">
+            <label>Data intake candidato
+              <input id="ammissione_data" name="when_admitted" type="text" placeholder="gg/mm/aaaa" data-target-key="dataSelezione" />
+            </label>
+            <label>Nome destinatario corso
+              <input id="given_name_student" name="given_name_student" type="text" data-target-key="nome" />
+            </label>
+            <label>Cognome anagrafico
+              <input id="family_name_student" name="family_name_student" type="text" data-target-key="cognome" />
+            </label>
+
+            <label>Genere anagrafico
+              <select id="gender_identity" name="gender_identity" data-target-key="sesso">
+                <option value="">Seleziona</option>
+                <option value="M">Maschio</option>
+                <option value="F">Femmina</option>
+              </select>
+            </label>
+            <label>Stato categoria protetta
+              <select id="protected_category_status" name="protected_category_status" data-target-key="disabile">
+                <option value="">Seleziona</option>
+                <option value="No">No</option>
+                <option value="Si">Si</option>
+              </select>
+            </label>
+            <label>Birth date (partecipante)
+              <input id="birth_dt_input" name="birth_dt_input" type="text" placeholder="gg/mm/aaaa" data-target-key="dataNascita" />
+            </label>
+
+            <label>Provincia area di nascita
+              <select id="birth_province_custom" name="birth_province_custom" data-target-key="provinciaNascita">
+                <option value="">Seleziona</option>
+                <option value="AG">AG - Agrigento</option>
+                <option value="CT">CT - Catania</option>
+                <option value="EN">EN - Enna</option>
+                <option value="ME">ME - Messina</option>
+                <option value="PA">PA - Palermo</option>
+              </select>
+            </label>
+            <label>Municipio di nascita
+              <select id="birth_city_custom" name="birth_city_custom" data-target-key="comuneNascita">
+                <option value="">Seleziona</option>
+                <option value="PALERMO">Palermo</option>
+                <option value="CATANIA">Catania</option>
+                <option value="MESSINA">Messina</option>
+                <option value="AGRIGENTO">Agrigento</option>
+              </select>
+            </label>
+            <label>Frazione nascita (opzionale)
+              <input id="birth_fraction_extra" name="birth_fraction_extra" type="text" data-target-key="altroComuneNascita" />
+            </label>
+
+            <label>Codice anagrafico nazionale (CF)
+              <input id="fiscal_identifier" name="fiscal_identifier" type="text" data-target-key="codiceFiscale" />
+            </label>
+            <label>Nazionalita primaria
+              <select id="nationality_status" name="nationality_status" data-target-key="cittadinanza">
+                <option value="">Seleziona</option>
+                <option value="IT">ITALIA</option>
+                <option value="UE">UNIONE EUROPEA</option>
+                <option value="EXTRA_UE">PAESE EXTRA UE</option>
+              </select>
+            </label>
+            <label>Seconda nazionalita
+              <select id="second_nationality_status" name="second_nationality_status" data-target-key="secondaCittadinanza">
+                <option value="">Seleziona</option>
+                <option value="IT">ITALIA</option>
+                <option value="UE">UNIONE EUROPEA</option>
+                <option value="EXTRA_UE">PAESE EXTRA UE</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Residenza e domicilio</h3>
+          <div class="grid three">
+            <label>Provincia domicilio fiscale residenza
+              <select id="residence_prov_alt" name="residence_prov_alt" data-target-key="residenzaProvincia">
+                <option value="">Seleziona</option>
+                <option value="CT">CT - Catania</option>
+                <option value="PA">PA - Palermo</option>
+                <option value="ME">ME - Messina</option>
+                <option value="EN">EN - Enna</option>
+              </select>
+            </label>
+            <label>Municipio residenza principale
+              <select id="residence_city_alt" name="residence_city_alt" data-target-key="residenzaComune">
+                <option value="">Seleziona</option>
+                <option value="PALERMO">Palermo</option>
+                <option value="CATANIA">Catania</option>
+                <option value="MESSINA">Messina</option>
+                <option value="ENNA">Enna</option>
+              </select>
+            </label>
+            <label>Altro comune residenza
+              <input id="residence_city_alt_other" name="residence_city_alt_other" type="text" data-target-key="residenzaAltroComune" />
+            </label>
+
+            <label>Indirizzo residenza ufficiale
+              <input id="residence_address_text" name="residence_address_text" type="text" data-target-key="residenzaIndirizzo" />
+            </label>
+            <label>CAP zona residenza
+              <input id="residence_zip_code" name="residence_zip_code" type="text" data-target-key="residenzaCap" />
+            </label>
+            <label>Provincia domicilio attuale
+              <select id="domicile_prov_alt" name="domicile_prov_alt" data-target-key="domicilioProvincia">
+                <option value="">Seleziona</option>
+                <option value="CT">CT - Catania</option>
+                <option value="PA">PA - Palermo</option>
+                <option value="ME">ME - Messina</option>
+                <option value="EN">EN - Enna</option>
+              </select>
+            </label>
+
+            <label>Comune domicilio attuale
+              <select id="domicile_city_alt" name="domicile_city_alt" data-target-key="domicilioComune">
+                <option value="">Seleziona</option>
+                <option value="PALERMO">Palermo</option>
+                <option value="CATANIA">Catania</option>
+                <option value="MESSINA">Messina</option>
+                <option value="ENNA">Enna</option>
+              </select>
+            </label>
+            <label>Altro comune domicilio
+              <input id="domicile_city_other" name="domicile_city_other" type="text" data-target-key="domicilioAltroComune" />
+            </label>
+            <label>Indirizzo domicilio effettivo
+              <input id="domicile_address_text" name="domicile_address_text" type="text" data-target-key="domicilioIndirizzo" />
+            </label>
+            <label>CAP domicilio
+              <input id="domicile_zip_code" name="domicile_zip_code" type="text" data-target-key="domicilioCap" />
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Titolo e stato occupazionale</h3>
+          <div class="grid two">
+            <label>Livello titolo studio posseduto
+              <select id="education_level_code" name="education_level_code" data-target-key="titoloStudio">
+                <option value="">Seleziona</option>
+                <option value="00">00 - Nessun titolo</option>
+                <option value="01">01 - Licenza elementare</option>
+                <option value="02">02 - Licenza media</option>
+                <option value="03">03 - Secondaria II grado (senza accesso universita')</option>
+                <option value="04">04 - Diploma con accesso universita'</option>
+                <option value="05">05 - Qualifica post diploma</option>
+                <option value="06">06 - Diploma ITS</option>
+                <option value="07">07 - Laurea triennale</option>
+                <option value="08">08 - Laurea magistrale</option>
+                <option value="09">09 - Dottorato</option>
+              </select>
+            </label>
+            <fieldset data-target-key="condizioneOccupazionale" data-radio-name="work_state_radio">
+              <legend>Stato soggetto nel mercato del lavoro</legend>
+              <div class="radio-row">
+                <label><input type="radio" name="work_state_radio" value="01" />Inoccupato</label>
+                <label><input type="radio" name="work_state_radio" value="03" />Disoccupato</label>
+              </div>
+            </fieldset>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Stage</h3>
+          <div class="grid three">
+            <label>Numero ore stage previste
+              <input id="stage_hours_total" name="stage_hours_total" type="number" data-target-key="oreStage" />
+            </label>
+            <label>Data avvio tirocinio
+              <input id="stage_start_date_custom" name="stage_start_date_custom" type="text" placeholder="gg/mm/aaaa" data-target-key="stageDataAvvio" />
+            </label>
+            <label>Data fine tirocinio
+              <input id="stage_end_date_custom" name="stage_end_date_custom" type="text" placeholder="gg/mm/aaaa" data-target-key="stageDataFine" />
+            </label>
+            <label>Totale giornate stage
+              <input id="stage_days_total" name="stage_days_total" type="number" data-target-key="giornateStage" />
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Ente ospitante</h3>
+          <div class="grid three">
+            <label>Ragione sociale ente
+              <input id="host_business_name" name="host_business_name" type="text" data-target-key="denominazione" />
+            </label>
+            <label>Codice IVA impresa
+              <input id="host_vat_code" name="host_vat_code" type="text" data-target-key="partitaIva" />
+            </label>
+            <label>Capienza allievi ente
+              <input id="host_students_capacity" name="host_students_capacity" type="number" data-target-key="allievi" />
+            </label>
+
+            <label>Provincia sede legale azienda
+              <select id="host_legal_prov_alt" name="host_legal_prov_alt" data-target-key="legaleProvincia">
+                <option value="">Seleziona</option>
+                <option value="AG">AG - Agrigento</option>
+                <option value="EN">EN - Enna</option>
+                <option value="CT">CT - Catania</option>
+              </select>
+            </label>
+            <label>Comune sede legale azienda
+              <select id="host_legal_city_alt" name="host_legal_city_alt" data-target-key="legaleComune">
+                <option value="">Seleziona</option>
+                <option value="AGRIGENTO">Agrigento</option>
+                <option value="ENNA">Enna</option>
+                <option value="CATANIA">Catania</option>
+              </select>
+            </label>
+            <label>Via sede legale
+              <input id="host_legal_address_alt" name="host_legal_address_alt" type="text" data-target-key="legaleIndirizzo" />
+            </label>
+            <label>N civico sede legale
+              <input id="host_legal_street_number" name="host_legal_street_number" type="text" data-target-key="legaleCivico" />
+            </label>
+
+            <label>Provincia sede operativa azienda
+              <select id="host_oper_prov_alt" name="host_oper_prov_alt" data-target-key="operativaProvincia">
+                <option value="">Seleziona</option>
+                <option value="AG">AG - Agrigento</option>
+                <option value="EN">EN - Enna</option>
+                <option value="CT">CT - Catania</option>
+              </select>
+            </label>
+            <label>Comune sede operativa azienda
+              <select id="host_oper_city_alt" name="host_oper_city_alt" data-target-key="operativaComune">
+                <option value="">Seleziona</option>
+                <option value="AGRIGENTO">Agrigento</option>
+                <option value="ENNA">Enna</option>
+                <option value="CATANIA">Catania</option>
+              </select>
+            </label>
+            <label>Via sede operativa
+              <input id="host_oper_address_alt" name="host_oper_address_alt" type="text" data-target-key="operativaIndirizzo" />
+            </label>
+            <label>N civico sede operativa
+              <input id="host_oper_street_number" name="host_oper_street_number" type="text" data-target-key="operativaCivico" />
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Contatti</h3>
+          <div class="grid three">
+            <label>Telefono fisso riferimento
+              <input id="contact_phone_landline" name="contact_phone_landline" type="text" data-target-key="telefono" />
+            </label>
+            <label>Email PEC referente
+              <input id="contact_mail_certified" name="contact_mail_certified" type="text" data-target-key="emailPec" />
+            </label>
+            <label>Numero cellulare referente
+              <input id="contact_mobile_number" name="contact_mobile_number" type="text" data-target-key="cellulare" />
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Campi esca (NON target)</h3>
+          <p class="subtle">Se questi campi vengono compilati dal bot, vengono contati come falsi positivi.</p>
+          <div class="grid three">
+            <label>Nome tutor interno (non target)
+              <input id="decoy_tutor_name" name="decoy_tutor_name" type="text" data-decoy="1" />
+            </label>
+            <label>Email referente stage (non target)
+              <input id="decoy_stage_email" name="decoy_stage_email" type="text" data-decoy="1" />
+            </label>
+            <label>Comune sede corso (non target)
+              <input id="decoy_course_city" name="decoy_course_city" type="text" data-decoy="1" />
+            </label>
+            <label>Numero protocollo pratica (non target)
+              <input id="decoy_protocol" name="decoy_protocol" type="text" data-decoy="1" />
+            </label>
+            <label>CAP amministrazione (non target)
+              <input id="decoy_admin_cap" name="decoy_admin_cap" type="text" data-decoy="1" />
+            </label>
+            <label>Stato pagamento quota (non target)
+              <input id="decoy_payment_status" name="decoy_payment_status" type="text" data-decoy="1" />
+            </label>
+          </div>
+        </section>
+      </form>
+
+      <section id="resultsPanel" class="panel">
+        <h2>Report accuracy</h2>
+        <div class="metric-row">
+          <div class="metric"><div class="label">Target totali</div><div class="value" id="metricTargets">0</div></div>
+          <div class="metric"><div class="label">Corretti</div><div class="value ok" id="metricCorrect">0</div></div>
+          <div class="metric"><div class="label">Mancanti</div><div class="value warn" id="metricMissing">0</div></div>
+          <div class="metric"><div class="label">Errati</div><div class="value err" id="metricWrong">0</div></div>
+          <div class="metric"><div class="label">Accuracy (recall)</div><div class="value" id="metricRecall">0%</div></div>
+          <div class="metric"><div class="label">Precisione</div><div class="value" id="metricPrecision">0%</div></div>
+        </div>
+        <p class="subtle" id="falsePositiveText"></p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Campo target</th>
+              <th>Atteso</th>
+              <th>Attuale</th>
+              <th>Esito</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script>
+      const EXPECTED_VALUES = {
+        dataSelezione: '2026-03-10',
+        nome: 'LUCIA',
+        cognome: 'CARUSO',
+        sesso: 'F',
+        disabile: 'Si',
+        dataNascita: '1997-08-21',
+        provinciaNascita: 'CT',
+        comuneNascita: 'CATANIA',
+        altroComuneNascita: 'FRAZIONE ETNEA',
+        codiceFiscale: 'CRSLCU97M61C351Y',
+        cittadinanza: 'IT',
+        secondaCittadinanza: 'UE',
+        residenzaProvincia: 'PA',
+        residenzaComune: 'PALERMO',
+        residenzaAltroComune: 'MONDELLO',
+        residenzaIndirizzo: 'VIA LIBERTA',
+        residenzaCap: '90143',
+        domicilioProvincia: 'ME',
+        domicilioComune: 'MESSINA',
+        domicilioAltroComune: 'TORRE FARO',
+        domicilioIndirizzo: 'VIA GARIBALDI',
+        domicilioCap: '98122',
+        titoloStudio: '04',
+        condizioneOccupazionale: '03',
+        oreStage: '360',
+        stageDataAvvio: '2026-09-01',
+        stageDataFine: '2026-12-20',
+        giornateStage: '72',
+        denominazione: 'ALFA FORMAZIONE SRL',
+        partitaIva: '01234567890',
+        allievi: '12',
+        legaleProvincia: 'AG',
+        legaleComune: 'AGRIGENTO',
+        legaleIndirizzo: 'VIA ROMA',
+        legaleCivico: '10',
+        operativaProvincia: 'EN',
+        operativaComune: 'ENNA',
+        operativaIndirizzo: 'CORSO SICILIA',
+        operativaCivico: '22',
+        telefono: '0911234567',
+        emailPec: 'info.test@pec.it',
+        cellulare: '3331234567'
+      };
+
+      const resultsBody = document.getElementById('resultsBody');
+      const profileDataPreview = document.getElementById('profileDataPreview');
+      const resultsPanel = document.getElementById('resultsPanel');
+      const formEl = document.getElementById('dynamicLabForm');
+
+      function normalize(value) {
+        return String(value || '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]/g, '');
+      }
+
+      function normalizeDate(value) {
+        const raw = String(value || '').trim();
+        if (!raw) return '';
+
+        let match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (match) return `${match[1]}-${match[2]}-${match[3]}`;
+
+        match = raw.match(/^(\d{2})[\/.-](\d{2})[\/.-](\d{4})$/);
+        if (match) return `${match[3]}-${match[2]}-${match[1]}`;
+
+        return normalize(raw);
+      }
+
+      function normalizeProvince(value) {
+        const raw = String(value || '').trim().toUpperCase();
+        if (!raw) return '';
+        if (/^[A-Z]{2}$/.test(raw)) return raw;
+        const fromText = raw.match(/\b([A-Z]{2})\b/);
+        return fromText ? fromText[1] : raw.slice(0, 2);
+      }
+
+      function normalizeChoice(key, value) {
+        const normalized = normalize(value);
+        if (!normalized) return '';
+        if (key === 'sesso') return normalized.startsWith('f') ? 'F' : 'M';
+        if (key === 'disabile') return normalized.startsWith('s') ? 'Si' : 'No';
+        if (key === 'condizioneOccupazionale') {
+          if (normalized === '03' || normalized.includes('disoccup')) return '03';
+          return '01';
+        }
+        if (key === 'titoloStudio') {
+          const twoDigits = String(value || '').match(/\d{2}/);
+          return twoDigits ? twoDigits[0] : normalized;
+        }
+        if (key === 'cittadinanza' || key === 'secondaCittadinanza') {
+          if (normalized.includes('extraue')) return 'EXTRA_UE';
+          if (normalized === 'ue' || normalized.includes('unioneeuropea')) return 'UE';
+          if (normalized === 'it' || normalized.includes('italia')) return 'IT';
+        }
+        return normalized;
+      }
+
+      function canonicalize(key, value) {
+        if (['dataSelezione', 'dataNascita', 'stageDataAvvio', 'stageDataFine'].includes(key)) return normalizeDate(value);
+        if (key.toLowerCase().includes('provincia')) return normalizeProvince(value);
+        if (['sesso', 'disabile', 'titoloStudio', 'condizioneOccupazionale', 'cittadinanza', 'secondaCittadinanza'].includes(key)) {
+          return normalizeChoice(key, value);
+        }
+        return normalize(value);
+      }
+
+      function getTargetNodeValue(node) {
+        if (node.dataset.radioName) {
+          const checked = document.querySelector(`input[type="radio"][name="${node.dataset.radioName}"]:checked`);
+          return checked ? checked.value : '';
+        }
+        if (node.tagName === 'INPUT' || node.tagName === 'SELECT' || node.tagName === 'TEXTAREA') {
+          return node.value;
+        }
+        return '';
+      }
+
+      function getTargetLabel(node) {
+        if (node.tagName === 'FIELDSET') return node.querySelector('legend')?.textContent?.trim() || node.dataset.targetKey;
+        if (node.closest('label')) return node.closest('label').childNodes[0]?.textContent?.trim() || node.dataset.targetKey;
+        return node.dataset.targetKey;
+      }
+
+      function evaluateAccuracy() {
+        const targetNodes = Array.from(document.querySelectorAll('[data-target-key]'));
+        const targetCount = targetNodes.length;
+        let correct = 0;
+        let missing = 0;
+        let wrong = 0;
+
+        const rows = [];
+
+        targetNodes.forEach((node) => {
+          const key = node.dataset.targetKey;
+          const expected = EXPECTED_VALUES[key] ?? '';
+          const current = getTargetNodeValue(node);
+          const currentTrimmed = String(current || '').trim();
+          const label = getTargetLabel(node);
+
+          if (!currentTrimmed) {
+            missing += 1;
+            rows.push({ label, expected, current, status: 'MANCANTE' });
+            return;
+          }
+
+          const expectedNorm = canonicalize(key, expected);
+          const currentNorm = canonicalize(key, currentTrimmed);
+          if (expectedNorm === currentNorm) {
+            correct += 1;
+            rows.push({ label, expected, current: currentTrimmed, status: 'OK' });
+          } else {
+            wrong += 1;
+            rows.push({ label, expected, current: currentTrimmed, status: 'ERRATO' });
+          }
+        });
+
+        const decoys = Array.from(document.querySelectorAll('[data-decoy="1"]'));
+        const falsePositives = decoys.filter((node) => String(node.value || '').trim() !== '').length;
+        const filledTargets = targetCount - missing;
+        const recall = targetCount === 0 ? 0 : (correct / targetCount) * 100;
+        const precisionDen = filledTargets + falsePositives;
+        const precision = precisionDen === 0 ? 0 : (correct / precisionDen) * 100;
+
+        document.getElementById('metricTargets').textContent = String(targetCount);
+        document.getElementById('metricCorrect').textContent = String(correct);
+        document.getElementById('metricMissing').textContent = String(missing);
+        document.getElementById('metricWrong').textContent = String(wrong);
+        document.getElementById('metricRecall').textContent = `${recall.toFixed(1)}%`;
+        document.getElementById('metricPrecision').textContent = `${precision.toFixed(1)}%`;
+        document.getElementById('falsePositiveText').textContent = `Falsi positivi su campi esca: ${falsePositives}`;
+
+        resultsBody.innerHTML = rows.map((row) => {
+          const statusClass = row.status === 'OK' ? 'status-ok' : (row.status === 'MANCANTE' ? 'status-miss' : 'status-ko');
+          return `<tr>
+            <td>${row.label}</td>
+            <td>${row.expected || '-'}</td>
+            <td>${row.current || '-'}</td>
+            <td class="${statusClass}">${row.status}</td>
+          </tr>`;
+        }).join('');
+
+        resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function resetAll() {
+        formEl.reset();
+        resultsBody.innerHTML = '';
+        document.getElementById('metricTargets').textContent = '0';
+        document.getElementById('metricCorrect').textContent = '0';
+        document.getElementById('metricMissing').textContent = '0';
+        document.getElementById('metricWrong').textContent = '0';
+        document.getElementById('metricRecall').textContent = '0%';
+        document.getElementById('metricPrecision').textContent = '0%';
+        document.getElementById('falsePositiveText').textContent = '';
+      }
+
+      async function copyProfileData() {
+        const text = JSON.stringify(EXPECTED_VALUES, null, 2);
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (_) {
+          profileDataPreview.focus();
+          profileDataPreview.select();
+          document.execCommand('copy');
+        }
+      }
+
+      profileDataPreview.value = JSON.stringify(EXPECTED_VALUES, null, 2);
+
+      document.getElementById('evaluateBtn').addEventListener('click', evaluateAccuracy);
+      document.getElementById('resetBtn').addEventListener('click', resetAll);
+      document.getElementById('copyProfileBtn').addEventListener('click', copyProfileData);
+    </script>
+  </body>
+</html>
